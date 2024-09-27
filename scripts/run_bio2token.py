@@ -14,7 +14,7 @@ from bio2token.utils.pdb import *
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--tokenizer", type=str, default="bio2token")
-    parser.add_argument("--pdb_file", type=str, default="6vn1.pdb")
+    parser.add_argument("--pdb_file", type=str, default="6n64.pdb")
     parser.add_argument("--res_type", type=str, default="AA")
     args = parser.parse_args()
 
