@@ -24,6 +24,8 @@ def main():
         checkpoint = "/home/pi-user/bio2token/checkpoints/protein2token.ckpt"
     if args.tokenizer == "bio2token":
         checkpoint = "/home/pi-user/bio2token/checkpoints/bio2token.ckpt"
+    if args.tokenizer == "rna2token":
+        checkpoint = "/home/pi-user/bio2token/checkpoints/rna2token.ckpt"
     config_model = load_config("/home/pi-user/bio2token/configs/tokenizer.yaml")
 
     # Instantiate and move the model to GPU

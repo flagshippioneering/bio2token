@@ -66,13 +66,13 @@ def compute_rmsd(P, Q, mask=None):
     return rmsd
 
 
-def compute_tm_score(P, Q, mask=None, seq_type="protein"):
+def compute_tm_score(P, Q, mask=None, seq_type="AA"):
     d = torch.sum((P - Q) ** 2, dim=-1)
     if mask is not None:
         N = torch.sum(mask, axis=-1)
-        if seq_type == "rna":
+        if seq_type == "RNA":
             d0 = 1.24 * torch.pow(N - 15, 1 / 3) - 1.8
-        elif seq_type == "protein":
+        elif seq_type == "AA":
             d0 = 0.6 * torch.pow(N - 0.5, 1 / 2) - 2.5
         else:
             raise ValueError(f"Unknown sequence type: {seq_type}. Should be rna or protein")
@@ -80,9 +80,9 @@ def compute_tm_score(P, Q, mask=None, seq_type="protein"):
         return torch.sum((1 / (1 + (d / d0.unsqueeze(-1)))) * mask, dim=-1) / N
     else:
         N = P.shape[1]
-        if seq_type == "rna":
+        if seq_type == "RNA":
             d0 = 1.24 * torch.pow(N - 15, 1 / 3) - 1.8
-        elif seq_type == "protein":
+        elif seq_type == "AA":
             d0 = 0.6 * torch.pow(N - 0.5, 1 / 2) - 2.5
         else:
             raise ValueError(f"Unknown sequence type: {seq_type}. Should be rna or protein")
@@ -90,40 +90,9 @@ def compute_tm_score(P, Q, mask=None, seq_type="protein"):
         return torch.sum((1 / (1 + (d / d0.unsqueeze(-1)))), dim=-1) / N
 
 
-class MambaConfig(Config):
-    d_model: int = 128
-    n_layer: int = 8
-    vocab_size: int = 4097
-    d_intermediate: int = 0
-    ssm_cfg: Optional[Dict[str, Any]] = None
-    attn_layer_idx: Optional[List] = None
-    attn_cfg: Optional[Dict] = None
-    rms_norm: bool = True
-    residual_in_fp32: bool = True
-    fused_add_norm: bool = True
-    pad_vocab_size_multiple: int = 1
-    tie_embeddings: bool = True
-    pretrained_model: Optional[str] = None
-
-
-class FSQ_AE_Config(Config):
-    vocab_size: str = "small"
-    node_hidden_dims_s: int = 128
-    nan_track: bool = True
-    pad_track: bool = True
-    use_fsq: bool = True
-    manual_masking: bool = True
-    loss_type: str = "mse"
-    compute_tm_score: bool = True
-    freeze_encoder: bool = False
-    mamba_encoder: MambaConfig
-    mamba_decoder: MambaConfig
-
-
 class FSQ_AE(nn.Module):
-    config_cls = FSQ_AE_Config
 
-    def __init__(self, config=config_cls):
+    def __init__(self, config):
         super(FSQ_AE, self).__init__()
         self.config = config
         ###### Define Encoder #######
@@ -170,18 +139,6 @@ class FSQ_AE(nn.Module):
         x_input = batch["coords_groundtruth"].squeeze(1).view(-1, self.config.max_len, 3).clone()
         x_input[~input_mask] = 0
         feature_track = []
-        if self.config.nan_track:
-            if "nan_mask" in batch.keys():
-                nan_mask = batch["nan_mask"].view(-1, self.config.max_len).clone()
-            else:
-                nan_mask = x_input.new_zeros(x_input.shape, dtype=torch.bool, device=x_input.device)
-            feature_track.append(nan_mask)
-        if self.config.pad_track:
-            if "pad_mask" in batch.keys():
-                pad_mask = batch["pad_mask"].view(-1, self.config.max_len).clone()
-            else:
-                pad_mask = x_input.new_zeros(x_input.shape, dtype=torch.bool, device=x_input.device)
-            feature_track.append(pad_mask)
         if len(feature_track) > 0:
             feature_track = torch.stack(feature_track, dim=-1)
             x_input = torch.cat([x_input, feature_track], dim=-1)
@@ -279,8 +236,6 @@ class FSQ_AE(nn.Module):
             return_dict["rmsd"] = rmsd_all  # B
             # TM scores
             return_dict["tm"] = tm_all
-
-            return_dict["indices"] = indices  # B
         return return_dict
 
 
