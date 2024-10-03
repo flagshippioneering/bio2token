@@ -13,9 +13,12 @@ from bio2token.utils.pdb import *
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--tokenizer", type=str, default="bio2token")
-    parser.add_argument("--pdb", type=str, default="6n64.pdb")
-    parser.add_argument("--chains", type=str, default=None)
+    parser.add_argument("--tokenizer", type=str, default="bio2token", help="Tokenizer to use")
+    parser.add_argument("--pdb", type=str, default="6n64", help="PDB file to parse")
+    parser.add_argument("--chains", type=str, default=None, help="Chains to parse from pdb, e.g. [A,C]")
+    parser.add_argument(
+        "--seq_type", type=str, default="AA", help="Sequence type, RNA or AA, only needed for TM-score calculation"
+    )
     args = parser.parse_args()
 
     if args.tokenizer == "mol2token":
@@ -46,7 +49,7 @@ def main():
     print(f"Number of parameters: {count_parameters(model)}")
     biomolecule = pdb_2_dict(os.path.join("./examples/ground_truth", args.pdb + ".pdb"), chains=args.chains)
     batch = pdb_to_batch(config_model, biomolecule)
-    batch["seq_type"] = "AA"
+    batch["seq_type"] = args.seq_type
 
     print(f"PDB file: {args.pdb}")
     print(f"Chains: {args.chains}")
