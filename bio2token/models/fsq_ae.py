@@ -5,8 +5,6 @@ from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 
 from bio2token.models.fsq import FSQ
 
-from bio2token.utils.utils import Config
-
 
 class Kabsch:
     def _centroid_adjust(self, X, mask=None):

@@ -3,6 +3,7 @@ from typing import *
 import torch
 import argparse
 import os
+import logging
 
 from bio2token.models.fsq_ae import FSQ_AE
 
@@ -46,21 +47,22 @@ def main():
         return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     # Print the number of parameters
-    print(f"Number of parameters: {count_parameters(model)}")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.info(f"Number of parameters: {count_parameters(model)}")
     biomolecule = pdb_2_dict(os.path.join("./examples/ground_truth", args.pdb + ".pdb"), chains=args.chains)
     batch = pdb_to_batch(config_model, biomolecule)
     batch["seq_type"] = args.seq_type
 
-    print(f"PDB file: {args.pdb}")
-    print(f"Chains: {args.chains}")
-    print(f"Number of residues: {len(biomolecule['seq'])}")
-    print(f"Number of atoms: {len(biomolecule['atom_names'])}")
+    logging.info(f"PDB file: {args.pdb}")
+    logging.info(f"Chains: {args.chains}")
+    logging.info(f"Number of residues: {len(biomolecule['seq'])}")
+    logging.info(f"Number of atoms: {len(biomolecule['atom_names'])}")
 
     with torch.no_grad():
         out = model.step(batch, mode="inference")
 
-    print("RMSD error: ", out["rmsd"])
-    print("TM-score: ", out["tm"])
+    logging.info(f"RMSD error: {out['rmsd'].item()}")
+    logging.info(f"TM-score: {out['tm'].item()}")
     # Cut out zeros in batch
     gt = out["coords_gt"][:, : biomolecule["atom_length"], :].squeeze(0).cpu().numpy()
     gt = np.split(gt, gt.shape[0])
