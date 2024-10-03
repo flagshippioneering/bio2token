@@ -13,8 +13,8 @@ Available tokenizer with checkpoints: <br>
 - bio2token
 
 All reconstructed pdbs will be written into the folder `examples/recon`: <br>
-- <pdb>_<tokenizer>_recon.pdb : auto-reconstructed pdb
-- <pdb>_<tokenizer>_gt.pdb : original ground truth structure (or chains that were selected in the input), centered and written to pdb 
+- `<pdb>_<tokenizer>_recon.pdb` : auto-reconstructed pdb
+- `<pdb>_<tokenizer>_gt.pdb` : original ground truth structure (or chains that were selected in the input), centered and written to pdb 
 
 ## Example calls
 To run examples mentioned in the manuscript: <br>
