@@ -19,14 +19,14 @@ def main():
     args = parser.parse_args()
 
     if args.tokenizer == "mol2token":
-        checkpoint = "/home/pi-user/bio2token/checkpoints/mol2token.ckpt"
+        checkpoint = "./checkpoints/mol2token.ckpt"
     if args.tokenizer == "protein2token":
-        checkpoint = "/home/pi-user/bio2token/checkpoints/protein2token.ckpt"
+        checkpoint = "./checkpoints/protein2token.ckpt"
     if args.tokenizer == "bio2token":
-        checkpoint = "/home/pi-user/bio2token/checkpoints/bio2token.ckpt"
+        checkpoint = "./checkpoints/bio2token.ckpt"
     if args.tokenizer == "rna2token":
-        checkpoint = "/home/pi-user/bio2token/checkpoints/rna2token.ckpt"
-    config_model = load_config("/home/pi-user/bio2token/configs/tokenizer.yaml")
+        checkpoint = "./checkpoints/rna2token.ckpt"
+    config_model = load_config("./configs/tokenizer.yaml")
 
     # Instantiate and move the model to GPU
     model = FSQ_AE(config_model).cuda()
@@ -44,9 +44,7 @@ def main():
 
     # Print the number of parameters
     print(f"Number of parameters: {count_parameters(model)}")
-    biomolecule = pdb_2_dict(
-        os.path.join("/home/pi-user/bio2token/examples/ground_truth", args.pdb + ".pdb"), chains=args.chains
-    )
+    biomolecule = pdb_2_dict(os.path.join("./examples/ground_truth", args.pdb + ".pdb"), chains=args.chains)
     batch = pdb_to_batch(config_model, biomolecule)
     batch["seq_type"] = "AA"
 
@@ -83,12 +81,12 @@ def main():
     # print(pdb_dict_recon)
     pdb_dict_to_file(
         pdb_dict_gt,
-        pdb_file_path=os.path.join("/home/pi-user/bio2token/examples/recon", f"{args.pdb}_{args.tokenizer}_gt.pdb"),
+        pdb_file_path=os.path.join("./examples/recon", f"{args.pdb}_{args.tokenizer}_gt.pdb"),
     )
 
     pdb_dict_to_file(
         pdb_dict_recon,
-        pdb_file_path=os.path.join("/home/pi-user/bio2token/examples/recon", f"{args.pdb}_{args.tokenizer}_recon.pdb"),
+        pdb_file_path=os.path.join("./examples/recon", f"{args.pdb}_{args.tokenizer}_recon.pdb"),
     )
 
 
