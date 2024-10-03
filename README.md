@@ -16,8 +16,8 @@ Available tokenizer with checkpoints: <br>
 To run examples mentioned in the manuscript: <br>
 To auto-reconstruct a small rna:<br>
 ```./run_bio2token --pdb 1rna --tokenizer rna2token```<br>
-To auto-reconstruct the biggest RNA chain from the RNA3DB test set:
-```./run_bio2token --pdb 8toc-pdb-bundle1 --tokenizer rna2token --chains [R]```
-To reconstruct a protein-RNA complex:
-```./run_bio2token --pdb 3wbm --tokenizer bio2token```
+To auto-reconstruct the biggest RNA chain from the RNA3DB test set: <br>
+```./run_bio2token --pdb 8toc-pdb-bundle1 --tokenizer rna2token --chains [R]``` <br>
+To reconstruct a protein-RNA complex: <br>
+```./run_bio2token --pdb 3wbm --tokenizer bio2token``` <br>
 All reconstructed pdbs go into the folder `examples/recon` together with the registered ground truth pdb
